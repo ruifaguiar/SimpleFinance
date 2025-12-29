@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SimpleFinance.Database/SimpleFinance.Database.csproj" />
+    <Project Path="src/SimpleFinance.Domain/SimpleFinance.Domain.csproj" />
+    <Project Path="src/SimpleFinance.Services/SimpleFinance.Services.csproj" />
+    <Project Path="src\SimpleFinance.Repository\SimpleFinance.Repository.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SimpleFinance.Domain.Tests/SimpleFinance.Domain.Tests.csproj" />
+    <Project Path="tests/SimpleFinance.Repository.Tests/SimpleFinance.Repository.Tests.csproj" />
+    <Project Path="tests/SimpleFinance.Services.Tests/SimpleFinance.Services.Tests.csproj" />
+  </Folder>
+  <Project Path="SimpleFinance.AppHost\SimpleFinance.AppHost.csproj" />
+</Solution>
