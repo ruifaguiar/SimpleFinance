@@ -1,7 +1,5 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src\SimpleFinance.Repository\SimpleFinance.Repository.csproj" />
-  </Folder>
+  <Folder Name="/src/" />
   <Folder Name="/tests/" />
   <Project Path="SimpleFinance.AppHost\SimpleFinance.AppHost.csproj" />
 </Solution>
