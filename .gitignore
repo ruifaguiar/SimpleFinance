@@ -48,3 +48,6 @@ Desktop.ini
 # Publish output
 publish/
 
+# EF Core design-time build hosts
+BuildHost-*/
+
