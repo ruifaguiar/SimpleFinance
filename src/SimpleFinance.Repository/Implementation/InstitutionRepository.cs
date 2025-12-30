@@ -28,19 +28,27 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
     public async Task<Institution> GetInstitutionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         var institution = await dbContext.Institutions.FindAsync([id], cancellationToken);
-        InstitutionNotFoundException.ThrowIfNotFound(institution,id);
+        NotFoundException.ThrowIfNotFound(institution, $"Institution with ID {id} not found.");
         return institution.ToDomain();
     }
     
     public async Task<Institution> UpdateInstitutionAsync(Institution institution, CancellationToken cancellationToken)
     {
         var dbInstitution = await dbContext.Institutions.FindAsync([institution.Id], cancellationToken);
-        InstitutionNotFoundException.ThrowIfNotFound(dbInstitution,institution.Id);
+        NotFoundException.ThrowIfNotFound(dbInstitution, $"Institution with ID {institution.Id} not found.");
         
         dbInstitution.Name = institution.Name;
         dbInstitution.ModifiedAt = DateTime.UtcNow;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            throw new EntityChangedException($"Institution with ID {institution.Id} was modified by another process.", ex);
+        }
+        
         return dbInstitution.ToDomain();
     }
 }

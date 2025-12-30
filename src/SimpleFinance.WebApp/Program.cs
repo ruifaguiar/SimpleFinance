@@ -8,6 +8,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDependencyInjection(builder.Configuration);
+builder.Services.AddBlazorBootstrap();
 
 var app = builder.Build();
 

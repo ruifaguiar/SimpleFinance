@@ -10,7 +10,5 @@ public class Institution
     public required string Name { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
-    
-    public uint Version { get; set; }
 }
 

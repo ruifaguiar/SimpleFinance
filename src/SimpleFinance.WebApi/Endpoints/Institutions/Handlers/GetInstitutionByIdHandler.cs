@@ -14,7 +14,7 @@ public class GetInstitutionByIdHandler(IInstitutionService institutionService)
         {
             institution = await institutionService.GetInstitutionByIdAsync(institutionId,cancellationToken);
         }
-        catch (InstitutionNotFoundException ex)
+        catch (NotFoundException ex)
         {
             return Results.NotFound();
         }

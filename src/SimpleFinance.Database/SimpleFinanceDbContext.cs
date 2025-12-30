@@ -10,7 +10,9 @@ public class SimpleFinanceDbContext(DbContextOptions<SimpleFinanceDbContext> opt
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Institution>()
-            .Property(p => p.Version)
-            .IsRowVersion();
+            .Property<uint>("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
     }
 }
