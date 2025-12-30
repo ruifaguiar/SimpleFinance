@@ -1,0 +1,113 @@
+@page "/institutions/{Id:guid}/edit"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject InstitutionGateway InstitutionGateway
+@inject NavigationManager NavigationManager
+
+<h3>Edit Institution</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_notFound)
+{
+    <div class="alert alert-warning">Institution not found.</div>
+    <a href="/institutions" class="btn btn-secondary">Back to Institutions</a>
+}
+else if (Institution != null)
+{
+    <EditForm Model="@Institution" OnValidSubmit="HandleValidSubmit" FormName="EditInstitutionForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="Institution.Name"/>
+            <ValidationMessage For="@(() => Institution.Name)"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Save Changes</span>
+            }
+        </button>
+        <a href="/institutions" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private InstitutionModel? Institution { get; set; }
+
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private bool _notFound;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var institution = await InstitutionGateway.GetInstitutionByIdAsync(Id);
+            if (institution == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                Institution ??= institution;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading institution: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await InstitutionGateway.UpdateInstitutionAsync(Id, Institution!);
+            if (result == null)
+            {
+                _errorMessage = "Institution not found.";
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/institutions");
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error updating institution: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

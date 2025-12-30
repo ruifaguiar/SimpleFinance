@@ -8,4 +8,9 @@
         <UserSecretsId>950124fc-87b4-4b4b-b741-bed108aaccab</UserSecretsId>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\src\SimpleFinance.WebApi\SimpleFinance.WebApi.csproj" />
+      <ProjectReference Include="..\src\SimpleFinance.WebApp\SimpleFinance.WebApp.csproj" />
+    </ItemGroup>
+
 </Project>

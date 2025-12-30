@@ -1,0 +1,70 @@
+@page "/AddInstitution"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject InstitutionGateway InstitutionGateway
+@inject NavigationManager NavigationManager
+
+<h3>Add Institution</h3>
+
+<EditForm Model="@Institution" OnValidSubmit="HandleValidSubmit" FormName="CreateInstitutionForm">
+    <DataAnnotationsValidator/>
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="Institution!.Name"/>
+        <ValidationMessage For="@(() => Institution!.Name)"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+        @if (_isSubmitting)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Saving...</span>
+        }
+        else
+        {
+            <span>Create Institution</span>
+        }
+    </button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+
+@code {
+
+    [SupplyParameterFromForm]
+    private InstitutionModel? Institution { get; set; }
+
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        Institution ??= new InstitutionModel { Name = string.Empty };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            await InstitutionGateway.CreateInstitutionAsync(Institution!);
+            NavigationManager.NavigateTo("/institutions");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error creating institution: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+}

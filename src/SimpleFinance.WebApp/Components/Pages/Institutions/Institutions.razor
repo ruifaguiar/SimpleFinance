@@ -1,0 +1,71 @@
+@page "/institutions"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject InstitutionGateway InstitutionGateway
+
+<h3>Institutions</h3>
+
+<div class="mb-3">
+    <a href="/AddInstitution" class="btn btn-primary">Add Institution</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_institutions == null || !_institutions.Any())
+{
+    <p>No institutions found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var institution in _institutions)
+            {
+                <tr>
+                    <td>@institution.Id</td>
+                    <td>@institution.Name</td>
+                    <td>
+                        <a href="/institutions/@institution.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<InstitutionModel>? _institutions;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _institutions = await InstitutionGateway.GetAllInstitutionsAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading institutions: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}
+
