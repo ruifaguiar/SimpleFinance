@@ -10,4 +10,9 @@ public class InstitutionService(IInstitutionRepository repository) : IInstitutio
     {
         return repository.AddInstitutionAsync(institution);
     }
+    
+    public Task<IEnumerable<Institution>> GetAllInstitutionsAsync()
+    {
+        return repository.GetAllInstitutionsAsync();
+    }
 }

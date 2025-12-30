@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SimpleFinance.Database;
 using SimpleFinance.Domain.DomainObjects;
 using SimpleFinance.Repository.Interfaces;
@@ -15,5 +16,11 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
         dbContext.Institutions.Add(dbInstitution);
         await dbContext.SaveChangesAsync();
         return institution;
+    }
+    
+    public async Task<IEnumerable<Institution>> GetAllInstitutionsAsync()
+    {
+        var institutions = await dbContext.Institutions.ToListAsync();
+        return institutions.Select(i => i.ToDomain());
     }
 }

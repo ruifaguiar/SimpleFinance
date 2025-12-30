@@ -6,7 +6,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddEndpointHandlers(this IServiceCollection services)
     {
-        services.AddScoped<AddInstitutionHandler>();
+        services
+            .AddScoped<AddInstitutionHandler>()
+            .AddScoped<GetInstitutionByIdHandler>()
+            .AddScoped<GetAllInstitutionsHandler>();
+        
         return services;
     }
 }

@@ -12,6 +12,6 @@ public class AddInstitutionHandler(IInstitutionService institutionService)
         
         var savedInstitution = await institutionService.AddInstitutionAsync(institution);
        
-        return Results.CreatedAtRoute($"GetInstitutionById", savedInstitution.ToModel());
+        return Results.CreatedAtRoute("GetInstitutionById", new { institutionId = savedInstitution.Id }, savedInstitution.ToModel());
     }
 }

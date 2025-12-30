@@ -5,6 +5,7 @@
     <Project Path="src/SimpleFinance.Services/SimpleFinance.Services.csproj" />
     <Project Path="src/SimpleFinance.WebApi/SimpleFinance.WebApi.csproj" />
     <Project Path="src/SimpleFinance.Repository\SimpleFinance.Repository.csproj" />
+    <Project Path="src/SimpleFinance.WebApp/SimpleFinance.WebApp.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/SimpleFinance.Domain.Tests/SimpleFinance.Domain.Tests.csproj" />

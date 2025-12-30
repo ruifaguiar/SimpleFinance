@@ -13,4 +13,9 @@ public static class InstitutionMappings
             Name = institution.Name
         };
     }
+    
+    public static DomainInstitution ToDomain(this DbInstitution institution)
+    {
+        return new DomainInstitution(institution.Id, institution.Name);
+    }
 }

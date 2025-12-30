@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\src\SimpleFinance.WebApi\SimpleFinance.WebApi.csproj" />
+      <ProjectReference Include="..\src\SimpleFinance.WebApp\SimpleFinance.WebApp.csproj" />
     </ItemGroup>
 
 </Project>

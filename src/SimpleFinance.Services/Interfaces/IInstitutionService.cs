@@ -4,5 +4,6 @@ namespace SimpleFinance.Services.Interfaces;
 
 public interface IInstitutionService
 {
-    public Task<Institution> AddInstitutionAsync(Institution institution);
+    Task<Institution> AddInstitutionAsync(Institution institution);
+    Task<IEnumerable<Institution>> GetAllInstitutionsAsync();
 }
