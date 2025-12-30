@@ -29,6 +29,7 @@ else
             <tr>
                 <th>Id</th>
                 <th>Name</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +38,9 @@ else
                 <tr>
                     <td>@institution.Id</td>
                     <td>@institution.Name</td>
+                    <td>
+                        <a href="/institutions/@institution.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                    </td>
                 </tr>
             }
         </tbody>

@@ -20,20 +20,20 @@ public class InstitutionServiceTests
     public async Task AddInstitutionAsync_ShouldCallRepository()
     {
         var institution = new Institution(Guid.NewGuid(), "Test Institution");
-        _repository.AddInstitutionAsync(institution).Returns(institution);
+        _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns(institution);
 
-        await _sut.AddInstitutionAsync(institution);
+        await _sut.AddInstitutionAsync(institution,CancellationToken.None);
 
-        await _repository.Received(1).AddInstitutionAsync(institution);
+        await _repository.Received(1).AddInstitutionAsync(institution,CancellationToken.None);
     }
 
     [Fact]
     public async Task AddInstitutionAsync_ShouldReturnInstitutionFromRepository()
     {
         var institution = new Institution(Guid.NewGuid(), "Test Institution");
-        _repository.AddInstitutionAsync(institution).Returns(institution);
+        _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns(institution);
 
-        var result = await _sut.AddInstitutionAsync(institution);
+        var result = await _sut.AddInstitutionAsync(institution,CancellationToken.None);
 
         Assert.Equal(institution, result);
     }
@@ -44,19 +44,19 @@ public class InstitutionServiceTests
         var id = Guid.NewGuid();
         var name = "Test Institution";
         var institution = new Institution(id, name);
-        _repository.AddInstitutionAsync(Arg.Any<Institution>()).Returns(institution);
+        _repository.AddInstitutionAsync(Arg.Any<Institution>(),CancellationToken.None).Returns(institution);
 
-        await _sut.AddInstitutionAsync(institution);
+        await _sut.AddInstitutionAsync(institution,CancellationToken.None);
 
-        await _repository.Received(1).AddInstitutionAsync(Arg.Is<Institution>(i => i.Id == id && i.Name == name));
+        await _repository.Received(1).AddInstitutionAsync(Arg.Is<Institution>(i => i.Id == id && i.Name == name),CancellationToken.None);
     }
 
     [Fact]
     public async Task AddInstitutionAsync_WhenRepositoryThrows_ShouldPropagateException()
     {
         var institution = new Institution(Guid.NewGuid(), "Test");
-        _repository.AddInstitutionAsync(institution).Returns<Institution>(_ => throw new InvalidOperationException("Database error"));
+        _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns<Institution>(_ => throw new InvalidOperationException("Database error"));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.AddInstitutionAsync(institution));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.AddInstitutionAsync(institution,CancellationToken.None));
     }
 }

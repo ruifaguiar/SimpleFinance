@@ -1,4 +1,4 @@
-using SimpleFinance.WebApi.Endpoints.Institution.Handlers;
+using SimpleFinance.WebApi.Endpoints.Institutions.Handlers;
 
 namespace SimpleFinance.WebApi.Configuration;
 
@@ -9,7 +9,8 @@ public static class DependencyInjection
         services
             .AddScoped<AddInstitutionHandler>()
             .AddScoped<GetInstitutionByIdHandler>()
-            .AddScoped<GetAllInstitutionsHandler>();
+            .AddScoped<GetAllInstitutionsHandler>()
+            .AddScoped<UpdateInstitutionHandler>();
         
         return services;
     }

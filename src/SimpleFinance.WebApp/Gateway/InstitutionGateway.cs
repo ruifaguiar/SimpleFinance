@@ -17,4 +17,26 @@ public class InstitutionGateway(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<IEnumerable<InstitutionModel>>() ?? [];
     }
+    
+    public async Task<InstitutionModel?> GetInstitutionByIdAsync(Guid id)
+    {
+        var response = await httpClient.GetAsync($"/api/institution/{id}");
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<InstitutionModel>();
+    }
+    
+    public async Task<InstitutionModel?> UpdateInstitutionAsync(Guid id, InstitutionModel institution)
+    {
+        var response = await httpClient.PutAsJsonAsync($"/api/institution/{id}", institution);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<InstitutionModel>();
+    }
 }
