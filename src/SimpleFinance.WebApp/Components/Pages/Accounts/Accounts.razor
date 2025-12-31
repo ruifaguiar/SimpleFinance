@@ -1,0 +1,178 @@
+@page "/accounts"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject AccountGateway AccountGateway
+@inject AccountTypeGateway AccountTypeGateway
+@inject InstitutionGateway InstitutionGateway
+
+<h3>Accounts</h3>
+
+<div class="mb-3">
+    <a href="/accounts/add" class="btn btn-primary">Add Account</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_accounts == null || !_accounts.Any())
+{
+    <p>No accounts found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Account Number</th>
+                <th>Account Type</th>
+                <th>Institution</th>
+                <th>Balance</th>
+                <th>Currency</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in _accounts)
+            {
+                <tr>
+                    <td>@account.Id</td>
+                    <td>@account.Name</td>
+                    <td>@account.AccountNumber</td>
+                    <td>@GetAccountTypeName(account.AccountTypeId)</td>
+                    <td>@GetInstitutionName(account.InstitutionId)</td>
+                    <td>@account.Balance.ToString("N2")</td>
+                    <td>@account.Currency</td>
+                    <td>@(account.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <a href="/accounts/@account.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(account)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showDeleteConfirmation && _accountToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete account "<strong>@_accountToDelete.Name</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteAccount">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<AccountModel>? _accounts;
+    private Dictionary<int, string> _accountTypeNames = new();
+    private Dictionary<Guid, string> _institutionNames = new();
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private AccountModel? _accountToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        
+        try
+        {
+            var accountTypesTask = AccountTypeGateway.GetAllAccountTypesAsync();
+            var institutionsTask = InstitutionGateway.GetAllInstitutionsAsync();
+            var accountsTask = AccountGateway.GetAllAccountsAsync();
+
+            await Task.WhenAll(accountTypesTask, institutionsTask, accountsTask);
+
+            var accountTypes = await accountTypesTask;
+            var institutions = await institutionsTask;
+            _accounts = await accountsTask;
+
+            _accountTypeNames = accountTypes.ToDictionary(at => at.Id!.Value, at => at.Name);
+            _institutionNames = institutions.ToDictionary(i => i.Id!.Value, i => i.Name);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private string GetAccountTypeName(int accountTypeId)
+    {
+        return _accountTypeNames.TryGetValue(accountTypeId, out var name) ? name : "Unknown";
+    }
+
+    private string GetInstitutionName(Guid institutionId)
+    {
+        return _institutionNames.TryGetValue(institutionId, out var name) ? name : "Unknown";
+    }
+
+    private void ConfirmDelete(AccountModel account)
+    {
+        _accountToDelete = account;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _accountToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteAccount()
+    {
+        if (_accountToDelete == null) return;
+
+        try
+        {
+            var deleted = await AccountGateway.DeleteAccountAsync(_accountToDelete.Id!.Value);
+            if (deleted)
+            {
+                await LoadData();
+            }
+            else
+            {
+                _errorMessage = "Account not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting account: {ex.Message}";
+        }
+        finally
+        {
+            CancelDelete();
+        }
+    }
+}
+

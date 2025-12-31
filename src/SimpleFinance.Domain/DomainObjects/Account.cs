@@ -8,7 +8,7 @@ public record Account
     public int AccountTypeId { get; }
     public decimal Balance { get; }
     public string Currency { get; }
-    public int InstitutionId { get; }
+    public Guid InstitutionId { get; }
     public bool IsActive { get; }
     public DateOnly? OpenedAt { get; }
     public DateOnly? ClosedAt { get; }
@@ -22,7 +22,7 @@ public record Account
         int accountTypeId,
         decimal balance,
         string currency,
-        int institutionId,
+        Guid institutionId,
         bool isActive,
         DateOnly? openedAt,
         DateOnly? closedAt,

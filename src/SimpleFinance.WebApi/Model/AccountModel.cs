@@ -23,7 +23,7 @@ public class AccountModel
     public string Currency { get; set; } = "EUR";
 
     [Required]
-    public required int InstitutionId { get; set; }
+    public required Guid InstitutionId { get; set; }
 
     public bool IsActive { get; set; } = true;
 
