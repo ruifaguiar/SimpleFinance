@@ -1,0 +1,149 @@
+@page "/transaction-types/add"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject TransactionTypeGateway TransactionTypeGateway
+@inject ExpenseCategoryGateway ExpenseCategoryGateway
+@inject NavigationManager NavigationManager
+
+<h3>Add Transaction Type</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="@TransactionType" OnValidSubmit="HandleValidSubmit" FormName="CreateTransactionTypeForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="TransactionType!.Name"/>
+            <ValidationMessage For="@(() => TransactionType!.Name)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="balanceImpact" class="form-label">Balance Impact</label>
+            <InputSelect id="balanceImpact" class="form-select" @bind-Value="TransactionType!.BalanceImpact">
+                <option value="0">-- Select Balance Impact --</option>
+                <option value="1">Credit (Income/Deposit)</option>
+                <option value="-1">Debit (Expense/Withdrawal)</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => TransactionType!.BalanceImpact)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <InputText id="category" class="form-control" @bind-Value="TransactionType!.Category"/>
+            <ValidationMessage For="@(() => TransactionType!.Category)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="expenseCategory" class="form-label">Expense Category</label>
+            <InputSelect id="expenseCategory" class="form-select" @bind-Value="TransactionType!.ExpenseCategoryId">
+                <option value="0">-- Select Expense Category (Optional) --</option>
+                @foreach (var category in _expenseCategories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => TransactionType!.ExpenseCategoryId)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <InputTextArea id="description" class="form-control" @bind-Value="TransactionType!.Description" rows="3"/>
+            <ValidationMessage For="@(() => TransactionType!.Description)"/>
+        </div>
+
+        <div class="mb-3 form-check">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="TransactionType!.IsActive"/>
+            <label for="isActive" class="form-check-label">Is Active</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Create Transaction Type</span>
+            }
+        </button>
+        <a href="/transaction-types" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+}
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private TransactionTypeModel? TransactionType { get; set; }
+
+    private IEnumerable<ExpenseCategoryModel> _expenseCategories = [];
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TransactionType ??= new TransactionTypeModel 
+        { 
+            Name = string.Empty,
+            BalanceImpact = 0,
+            IsActive = true
+        };
+
+        try
+        {
+            _expenseCategories = await ExpenseCategoryGateway.GetAllExpenseCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (TransactionType == null)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await TransactionTypeGateway.CreateTransactionTypeAsync(TransactionType);
+            if (result != null)
+            {
+                NavigationManager.NavigateTo("/transaction-types");
+            }
+            else
+            {
+                _errorMessage = "Failed to create transaction type.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error creating transaction type: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

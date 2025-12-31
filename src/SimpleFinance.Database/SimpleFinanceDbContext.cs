@@ -10,6 +10,7 @@ public class SimpleFinanceDbContext(DbContextOptions<SimpleFinanceDbContext> opt
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<TransactionType> TransactionTypes { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -38,6 +39,13 @@ public class SimpleFinanceDbContext(DbContextOptions<SimpleFinanceDbContext> opt
             .IsConcurrencyToken();
 
         modelBuilder.Entity<Transaction>()
+            .Property<uint>("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
+        modelBuilder.Entity<TransactionType>()
+            .ToTable("TransactionType")
             .Property<uint>("xmin")
             .HasColumnType("xid")
             .ValueGeneratedOnAddOrUpdate()

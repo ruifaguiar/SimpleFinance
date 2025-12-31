@@ -1,0 +1,176 @@
+@page "/transaction-types"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject TransactionTypeGateway TransactionTypeGateway
+@inject ExpenseCategoryGateway ExpenseCategoryGateway
+
+<h3>Transaction Types</h3>
+
+<div class="mb-3">
+    <a href="/transaction-types/add" class="btn btn-primary">Add Transaction Type</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_transactionTypes == null || !_transactionTypes.Any())
+{
+    <p>No transaction types found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Balance Impact</th>
+                <th>Category</th>
+                <th>Expense Category</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transactionType in _transactionTypes)
+            {
+                <tr>
+                    <td>@transactionType.Id</td>
+                    <td>@transactionType.Name</td>
+                    <td>@GetBalanceImpactName(transactionType.BalanceImpact)</td>
+                    <td>@transactionType.Category</td>
+                    <td>@GetExpenseCategoryName(transactionType.ExpenseCategoryId)</td>
+                    <td>@(transactionType.IsActive ? "Yes" : "No")</td>
+                    <td>
+                        <a href="/transaction-types/@transactionType.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(transactionType)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showDeleteConfirmation && _transactionTypeToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete transaction type "<strong>@_transactionTypeToDelete.Name</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteTransactionType">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<TransactionTypeModel>? _transactionTypes;
+    private Dictionary<int, string> _expenseCategoryNames = new();
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private TransactionTypeModel? _transactionTypeToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        
+        try
+        {
+            var expenseCategoriesTask = ExpenseCategoryGateway.GetAllExpenseCategoriesAsync();
+            var transactionTypesTask = TransactionTypeGateway.GetAllTransactionTypesAsync();
+
+            await Task.WhenAll(expenseCategoriesTask, transactionTypesTask);
+
+            var expenseCategories = await expenseCategoriesTask;
+            _transactionTypes = await transactionTypesTask;
+
+            _expenseCategoryNames = expenseCategories.ToDictionary(ec => ec.Id!.Value, ec => ec.Name);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private string GetBalanceImpactName(int balanceImpact)
+    {
+        return balanceImpact switch
+        {
+            1 => "Credit",
+            -1 => "Debit",
+            _ => "Unknown"
+        };
+    }
+
+    private string GetExpenseCategoryName(int expenseCategoryId)
+    {
+        if (expenseCategoryId == 0) return "-";
+        return _expenseCategoryNames.TryGetValue(expenseCategoryId, out var name) ? name : "Unknown";
+    }
+
+    private void ConfirmDelete(TransactionTypeModel transactionType)
+    {
+        _transactionTypeToDelete = transactionType;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _transactionTypeToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteTransactionType()
+    {
+        if (_transactionTypeToDelete?.Id == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var success = await TransactionTypeGateway.DeleteTransactionTypeAsync(_transactionTypeToDelete.Id.Value);
+            if (success)
+            {
+                _showDeleteConfirmation = false;
+                _transactionTypeToDelete = null;
+                await LoadData();
+            }
+            else
+            {
+                _errorMessage = "Failed to delete transaction type. It may have already been deleted.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting transaction type: {ex.Message}";
+        }
+    }
+}
+
