@@ -1,0 +1,123 @@
+@page "/expense-categories/{Id:int}/edit"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject ExpenseCategoryGateway ExpenseCategoryGateway
+@inject NavigationManager NavigationManager
+
+<h3>Edit Expense Category</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_notFound)
+{
+    <div class="alert alert-warning">Expense category not found.</div>
+    <a href="/expense-categories" class="btn btn-secondary">Back to Expense Categories</a>
+}
+else if (ExpenseCategory != null)
+{
+    <EditForm Model="@ExpenseCategory" OnValidSubmit="HandleValidSubmit" FormName="EditExpenseCategoryForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="ExpenseCategory.Name"/>
+            <ValidationMessage For="@(() => ExpenseCategory.Name)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" @bind="ExpenseCategory.Description"></textarea>
+            <ValidationMessage For="@(() => ExpenseCategory.Description)"/>
+        </div>
+
+        <div class="mb-3 form-check">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="ExpenseCategory.IsActive"/>
+            <label for="isActive" class="form-check-label">Active</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Save Changes</span>
+            }
+        </button>
+        <a href="/expense-categories" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ExpenseCategoryModel? ExpenseCategory { get; set; }
+
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private bool _notFound;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var expenseCategory = await ExpenseCategoryGateway.GetExpenseCategoryByIdAsync(Id);
+            if (expenseCategory == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                ExpenseCategory ??= expenseCategory;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading expense category: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await ExpenseCategoryGateway.UpdateExpenseCategoryAsync(Id, ExpenseCategory!);
+            if (result == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/expense-categories");
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error updating expense category: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}

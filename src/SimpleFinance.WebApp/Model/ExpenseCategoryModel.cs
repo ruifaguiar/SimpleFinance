@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace SimpleFinance.WebApi.Model;
+namespace SimpleFinance.WebApp.Model;
 
 public class ExpenseCategoryModel
 {
@@ -15,4 +15,3 @@ public class ExpenseCategoryModel
 
     public bool IsActive { get; set; } = true;
 }
-
