@@ -1,0 +1,152 @@
+@page "/transactions/add"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject TransactionGateway TransactionGateway
+@inject AccountGateway AccountGateway
+@inject NavigationManager NavigationManager
+
+<h3>Add Transaction</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="@Transaction" OnValidSubmit="HandleValidSubmit" FormName="CreateTransactionForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="account" class="form-label">Account</label>
+            <InputSelect id="account" class="form-select" @bind-Value="Transaction!.AccountId">
+                <option value="0">-- Select Account --</option>
+                @foreach (var account in _accounts)
+                {
+                    <option value="@account.Id">@account.Name (@account.Currency)</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => Transaction!.AccountId)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <InputNumber id="amount" class="form-control" @bind-Value="Transaction!.Amount" step="0.01"/>
+            <ValidationMessage For="@(() => Transaction!.Amount)"/>
+            <small class="text-muted">Use negative values for expenses/withdrawals and positive for income/deposits.</small>
+        </div>
+
+        <div class="mb-3">
+            <label for="transactionTypeId" class="form-label">Transaction Type ID</label>
+            <InputNumber id="transactionTypeId" class="form-control" @bind-Value="Transaction!.TransactionTypeId"/>
+            <ValidationMessage For="@(() => Transaction!.TransactionTypeId)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="transactionDate" class="form-label">Transaction Date</label>
+            <InputDate id="transactionDate" class="form-control" @bind-Value="_transactionDate"/>
+            <ValidationMessage For="@(() => Transaction!.TransactionDate)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <InputTextArea id="description" class="form-control" @bind-Value="Transaction!.Description" rows="3"/>
+            <ValidationMessage For="@(() => Transaction!.Description)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="currency" class="form-label">Currency</label>
+            <InputText id="currency" class="form-control" @bind-Value="Transaction!.Currency"/>
+            <ValidationMessage For="@(() => Transaction!.Currency)"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Create Transaction</span>
+            }
+        </button>
+        <a href="/transactions" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+}
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    private TransactionModel? Transaction { get; set; }
+
+    private IEnumerable<AccountModel> _accounts = [];
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private string? _errorMessage;
+    private DateOnly _transactionDate = DateOnly.FromDateTime(DateTime.Today);
+
+    protected override async Task OnInitializedAsync()
+    {
+        Transaction ??= new TransactionModel 
+        { 
+            AccountId = 0,
+            Amount = 0,
+            TransactionTypeId = 1,
+            TransactionDate = DateTime.Today,
+            Currency = "EUR"
+        };
+
+        try
+        {
+            _accounts = await AccountGateway.GetAllAccountsAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (Transaction == null)
+        {
+            return;
+        }
+
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            Transaction.TransactionDate = _transactionDate.ToDateTime(TimeOnly.MinValue);
+            
+            var result = await TransactionGateway.CreateTransactionAsync(Transaction);
+            if (result != null)
+            {
+                NavigationManager.NavigateTo("/transactions");
+            }
+            else
+            {
+                _errorMessage = "Failed to create transaction.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error creating transaction: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+
