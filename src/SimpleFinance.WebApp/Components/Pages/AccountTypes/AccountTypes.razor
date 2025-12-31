@@ -1,0 +1,142 @@
+@page "/account-types"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject AccountTypeGateway AccountTypeGateway
+
+<h3>Account Types</h3>
+
+<div class="mb-3">
+    <a href="/account-types/add" class="btn btn-primary">Add Account Type</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_accountTypes == null || !_accountTypes.Any())
+{
+    <p>No account types found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var accountType in _accountTypes)
+            {
+                <tr>
+                    <td>@accountType.Id</td>
+                    <td>@accountType.Name</td>
+                    <td>@accountType.Description</td>
+                    <td>
+                        <a href="/account-types/@accountType.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(accountType)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showDeleteConfirmation && _accountTypeToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete account type "<strong>@_accountTypeToDelete.Name</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteAccountType">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<AccountTypeModel>? _accountTypes;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private AccountTypeModel? _accountTypeToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAccountTypes();
+    }
+
+    private async Task LoadAccountTypes()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        
+        try
+        {
+            _accountTypes = await AccountTypeGateway.GetAllAccountTypesAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading account types: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ConfirmDelete(AccountTypeModel accountType)
+    {
+        _accountTypeToDelete = accountType;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _accountTypeToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteAccountType()
+    {
+        if (_accountTypeToDelete == null) return;
+
+        try
+        {
+            var deleted = await AccountTypeGateway.DeleteAccountTypeAsync(_accountTypeToDelete.Id!.Value);
+            if (deleted)
+            {
+                await LoadAccountTypes();
+            }
+            else
+            {
+                _errorMessage = "Account type not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting account type: {ex.Message}";
+        }
+        finally
+        {
+            CancelDelete();
+        }
+    }
+}
