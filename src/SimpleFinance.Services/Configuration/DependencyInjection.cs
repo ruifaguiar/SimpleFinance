@@ -13,6 +13,7 @@ public static class DependencyInjection
        services.AddTransient<IAccountTypeService, AccountTypeService>();
        services.AddTransient<IAccountService, AccountService>();
        services.AddTransient<IExpenseCategoryService, ExpenseCategoryService>();
+       services.AddTransient<ITransactionService, TransactionService>();
 
         return services;
     }
