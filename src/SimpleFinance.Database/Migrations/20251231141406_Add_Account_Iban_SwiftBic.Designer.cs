@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SimpleFinance.Database;
@@ -11,9 +12,11 @@ using SimpleFinance.Database;
 namespace SimpleFinance.Database.Migrations
 {
     [DbContext(typeof(SimpleFinanceDbContext))]
-    partial class SimpleFinanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251231141406_Add_Account_Iban_SwiftBic")]
+    partial class Add_Account_Iban_SwiftBic
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

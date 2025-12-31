@@ -31,6 +31,18 @@ else
         </div>
 
         <div class="mb-3">
+            <label for="iban" class="form-label">IBAN</label>
+            <InputText id="iban" class="form-control" @bind-Value="Account!.Iban" placeholder="e.g., DE89370400440532013000"/>
+            <ValidationMessage For="@(() => Account!.Iban)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="swiftBic" class="form-label">SWIFT/BIC Code</label>
+            <InputText id="swiftBic" class="form-control" @bind-Value="Account!.SwiftBic" placeholder="e.g., COBADEFFXXX"/>
+            <ValidationMessage For="@(() => Account!.SwiftBic)"/>
+        </div>
+
+        <div class="mb-3">
             <label for="accountType" class="form-label">Account Type</label>
             <InputSelect id="accountType" class="form-select" @bind-Value="Account!.AccountTypeId">
                 <option value="0">-- Select Account Type --</option>

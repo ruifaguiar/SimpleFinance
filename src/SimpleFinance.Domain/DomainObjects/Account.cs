@@ -5,6 +5,8 @@ public record Account
     public int Id { get; }
     public string Name { get; }
     public string? AccountNumber { get; }
+    public string? Iban { get; }
+    public string? SwiftBic { get; }
     public int AccountTypeId { get; }
     public decimal Balance { get; }
     public string Currency { get; }
@@ -19,6 +21,8 @@ public record Account
         int id,
         string name,
         string? accountNumber,
+        string? iban,
+        string? swiftBic,
         int accountTypeId,
         decimal balance,
         string currency,
@@ -47,6 +51,8 @@ public record Account
         Id = id;
         Name = name;
         AccountNumber = accountNumber;
+        Iban = iban;
+        SwiftBic = swiftBic;
         AccountTypeId = accountTypeId;
         Balance = balance;
         Currency = currency;
