@@ -1,0 +1,82 @@
+@page "/expense-categories/add"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject ExpenseCategoryGateway ExpenseCategoryGateway
+@inject NavigationManager NavigationManager
+
+<h3>Add Expense Category</h3>
+
+<EditForm Model="@ExpenseCategory" OnValidSubmit="HandleValidSubmit" FormName="CreateExpenseCategoryForm">
+    <DataAnnotationsValidator/>
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="ExpenseCategory!.Name"/>
+        <ValidationMessage For="@(() => ExpenseCategory!.Name)"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" class="form-control" @bind="ExpenseCategory!.Description"></textarea>
+        <ValidationMessage For="@(() => ExpenseCategory!.Description)"/>
+    </div>
+
+    <div class="mb-3 form-check">
+        <InputCheckbox id="isActive" class="form-check-input" @bind-Value="ExpenseCategory!.IsActive"/>
+        <label for="isActive" class="form-check-label">Active</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+        @if (_isSubmitting)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Saving...</span>
+        }
+        else
+        {
+            <span>Create Expense Category</span>
+        }
+    </button>
+    <a href="/expense-categories" class="btn btn-secondary ms-2">Cancel</a>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+
+@code {
+
+    [SupplyParameterFromForm]
+    private ExpenseCategoryModel? ExpenseCategory { get; set; }
+
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        ExpenseCategory ??= new ExpenseCategoryModel { Name = string.Empty, IsActive = true };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            await ExpenseCategoryGateway.CreateExpenseCategoryAsync(ExpenseCategory!);
+            NavigationManager.NavigateTo("/expense-categories");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error creating expense category: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

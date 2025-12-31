@@ -1,0 +1,154 @@
+@page "/expense-categories"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject ExpenseCategoryGateway ExpenseCategoryGateway
+
+<h3>Expense Categories</h3>
+
+<div class="mb-3">
+    <a href="/expense-categories/add" class="btn btn-primary">Add Expense Category</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_expenseCategories == null || !_expenseCategories.Any())
+{
+    <p>No expense categories found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Active</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var expenseCategory in _expenseCategories)
+            {
+                <tr>
+                    <td>@expenseCategory.Id</td>
+                    <td>@expenseCategory.Name</td>
+                    <td>@expenseCategory.Description</td>
+                    <td>
+                        @if (expenseCategory.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        <a href="/expense-categories/@expenseCategory.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(expenseCategory)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showDeleteConfirmation && _expenseCategoryToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete expense category "<strong>@_expenseCategoryToDelete.Name</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteExpenseCategory">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<ExpenseCategoryModel>? _expenseCategories;
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private ExpenseCategoryModel? _expenseCategoryToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExpenseCategories();
+    }
+
+    private async Task LoadExpenseCategories()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _expenseCategories = await ExpenseCategoryGateway.GetAllExpenseCategoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading expense categories: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void ConfirmDelete(ExpenseCategoryModel expenseCategory)
+    {
+        _expenseCategoryToDelete = expenseCategory;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _expenseCategoryToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteExpenseCategory()
+    {
+        if (_expenseCategoryToDelete?.Id == null) return;
+
+        try
+        {
+            var success = await ExpenseCategoryGateway.DeleteExpenseCategoryAsync(_expenseCategoryToDelete.Id.Value);
+            if (success)
+            {
+                await LoadExpenseCategories();
+            }
+            else
+            {
+                _errorMessage = "Expense category not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting expense category: {ex.Message}";
+        }
+        finally
+        {
+            CancelDelete();
+        }
+    }
+}
+

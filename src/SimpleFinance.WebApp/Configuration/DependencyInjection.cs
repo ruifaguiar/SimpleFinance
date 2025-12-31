@@ -22,6 +22,16 @@ public static class DependencyInjection
         {
             client.BaseAddress = baseAddress;
         });
+
+        services.AddHttpClient<ExpenseCategoryGateway>(client =>
+        {
+            client.BaseAddress = baseAddress;
+        });
+
+        services.AddHttpClient<TransactionGateway>(client =>
+        {
+            client.BaseAddress = baseAddress;
+        });
         
         return services;
     }

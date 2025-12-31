@@ -1,0 +1,169 @@
+@page "/transactions"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject TransactionGateway TransactionGateway
+@inject AccountGateway AccountGateway
+
+<h3>Transactions</h3>
+
+<div class="mb-3">
+    <a href="/transactions/add" class="btn btn-primary">Add Transaction</a>
+</div>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_errorMessage != null)
+{
+    <div class="alert alert-danger">@_errorMessage</div>
+}
+else if (_transactions == null || !_transactions.Any())
+{
+    <p>No transactions found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Account</th>
+                <th>Amount</th>
+                <th>Currency</th>
+                <th>Transaction Date</th>
+                <th>Description</th>
+                <th>Balance After</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in _transactions.OrderByDescending(t => t.TransactionDate))
+            {
+                <tr>
+                    <td>@transaction.Id</td>
+                    <td>@GetAccountName(transaction.AccountId)</td>
+                    <td class="@(transaction.Amount >= 0 ? "text-success" : "text-danger")">
+                        @transaction.Amount.ToString("N2")
+                    </td>
+                    <td>@transaction.Currency</td>
+                    <td>@transaction.TransactionDate.ToString("yyyy-MM-dd")</td>
+                    <td>@transaction.Description</td>
+                    <td>@transaction.BalanceAfterTransaction.ToString("N2")</td>
+                    <td>
+                        <a href="/transactions/@transaction.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(transaction)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (_showDeleteConfirmation && _transactionToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete transaction #<strong>@_transactionToDelete.Id</strong> for <strong>@_transactionToDelete.Amount.ToString("N2") @_transactionToDelete.Currency</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteTransaction">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IEnumerable<TransactionModel>? _transactions;
+    private Dictionary<int, string> _accountNames = new();
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private TransactionModel? _transactionToDelete;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        
+        try
+        {
+            var accountsTask = AccountGateway.GetAllAccountsAsync();
+            var transactionsTask = TransactionGateway.GetAllTransactionsAsync();
+
+            await Task.WhenAll(accountsTask, transactionsTask);
+
+            var accounts = await accountsTask;
+            _transactions = await transactionsTask;
+
+            _accountNames = accounts.ToDictionary(a => a.Id!.Value, a => a.Name);
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private string GetAccountName(int accountId)
+    {
+        return _accountNames.TryGetValue(accountId, out var name) ? name : "Unknown";
+    }
+
+    private void ConfirmDelete(TransactionModel transaction)
+    {
+        _transactionToDelete = transaction;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _transactionToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteTransaction()
+    {
+        if (_transactionToDelete?.Id == null)
+        {
+            return;
+        }
+
+        try
+        {
+            var success = await TransactionGateway.DeleteTransactionAsync(_transactionToDelete.Id.Value);
+            if (success)
+            {
+                _showDeleteConfirmation = false;
+                _transactionToDelete = null;
+                await LoadData();
+            }
+            else
+            {
+                _errorMessage = "Failed to delete transaction. It may have already been deleted.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting transaction: {ex.Message}";
+        }
+    }
+}
+
