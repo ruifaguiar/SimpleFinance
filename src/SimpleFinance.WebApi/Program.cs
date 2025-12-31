@@ -5,6 +5,7 @@ using SimpleFinance.WebApi.Configuration;
 using SimpleFinance.WebApi.Endpoints.Institutions;
 using SimpleFinance.WebApi.Endpoints.AccountTypes;
 using SimpleFinance.WebApi.Endpoints.Accounts;
+using SimpleFinance.WebApi.Endpoints.ExpenseCategories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ app.UseHttpsRedirection();
 app.MapInstitutionEndpoints();
 app.MapAccountTypeEndpoints();
 app.MapAccountEndpoints();
+app.MapExpenseCategoryEndpoints();
 
 
 

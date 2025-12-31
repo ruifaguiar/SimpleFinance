@@ -1,6 +1,7 @@
 using SimpleFinance.WebApi.Endpoints.Institutions.Handlers;
 using SimpleFinance.WebApi.Endpoints.AccountTypes.Handlers;
 using SimpleFinance.WebApi.Endpoints.Accounts.Handlers;
+using SimpleFinance.WebApi.Endpoints.ExpenseCategories.Handlers;
 
 namespace SimpleFinance.WebApi.Configuration;
 
@@ -22,7 +23,12 @@ public static class DependencyInjection
             .AddScoped<GetAccountByIdHandler>()
             .AddScoped<GetAllAccountsHandler>()
             .AddScoped<UpdateAccountHandler>()
-            .AddScoped<DeleteAccountHandler>();
+            .AddScoped<DeleteAccountHandler>()
+            .AddScoped<AddExpenseCategoryHandler>()
+            .AddScoped<GetExpenseCategoryByIdHandler>()
+            .AddScoped<GetAllExpenseCategoriesHandler>()
+            .AddScoped<UpdateExpenseCategoryHandler>()
+            .AddScoped<DeleteExpenseCategoryHandler>();
         
         return services;
     }
