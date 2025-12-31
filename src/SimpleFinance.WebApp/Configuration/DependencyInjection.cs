@@ -32,6 +32,11 @@ public static class DependencyInjection
         {
             client.BaseAddress = baseAddress;
         });
+
+        services.AddHttpClient<TransactionTypeGateway>(client =>
+        {
+            client.BaseAddress = baseAddress;
+        });
         
         return services;
     }

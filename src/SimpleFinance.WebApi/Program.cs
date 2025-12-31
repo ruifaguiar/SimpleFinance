@@ -7,6 +7,7 @@ using SimpleFinance.WebApi.Endpoints.AccountTypes;
 using SimpleFinance.WebApi.Endpoints.Accounts;
 using SimpleFinance.WebApi.Endpoints.ExpenseCategories;
 using SimpleFinance.WebApi.Endpoints.Transactions;
+using SimpleFinance.WebApi.Endpoints.TransactionTypes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ app.MapAccountTypeEndpoints();
 app.MapAccountEndpoints();
 app.MapExpenseCategoryEndpoints();
 app.MapTransactionEndpoints();
+app.MapTransactionTypeEndpoints();
 
 
 
