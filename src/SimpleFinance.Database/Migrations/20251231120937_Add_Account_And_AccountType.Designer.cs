@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SimpleFinance.Database;
@@ -11,9 +12,11 @@ using SimpleFinance.Database;
 namespace SimpleFinance.Database.Migrations
 {
     [DbContext(typeof(SimpleFinanceDbContext))]
-    partial class SimpleFinanceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251231120937_Add_Account_And_AccountType")]
+    partial class Add_Account_And_AccountType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,27 +41,27 @@ namespace SimpleFinance.Database.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateOnly?>("ClosedAt")
                         .HasColumnType("date");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("CreatedAt")
+                        .HasColumnType("date");
 
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(3)
                         .HasColumnType("character varying(3)");
 
-                    b.Property<Guid>("InstitutionId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("InstitutionId")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly?>("ModifiedAt")
+                        .HasColumnType("date");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -75,6 +78,8 @@ namespace SimpleFinance.Database.Migrations
                         .HasColumnName("xmin");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountTypeId");
 
                     b.ToTable("Accounts");
                 });
@@ -133,6 +138,17 @@ namespace SimpleFinance.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Institutions");
+                });
+
+            modelBuilder.Entity("SimpleFinance.Database.Entities.Account", b =>
+                {
+                    b.HasOne("SimpleFinance.Database.Entities.AccountType", "AccountType")
+                        .WithMany()
+                        .HasForeignKey("AccountTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccountType");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,119 @@
+@page "/account-types/{Id:int}/edit"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject AccountTypeGateway AccountTypeGateway
+@inject NavigationManager NavigationManager
+
+<h3>Edit Account Type</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_notFound)
+{
+    <div class="alert alert-warning">Account type not found.</div>
+    <a href="/account-types" class="btn btn-secondary">Back to Account Types</a>
+}
+else if (AccountType != null)
+{
+    <EditForm Model="@AccountType" OnValidSubmit="HandleValidSubmit" FormName="EditAccountTypeForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="AccountType.Name"/>
+            <ValidationMessage For="@(() => AccountType.Name)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" @bind="AccountType.Description"></textarea>
+            <ValidationMessage For="@(() => AccountType.Description)"/>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Save Changes</span>
+            }
+        </button>
+        <a href="/account-types" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private AccountTypeModel? AccountType { get; set; }
+
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private bool _notFound;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var accountType = await AccountTypeGateway.GetAccountTypeByIdAsync(Id);
+            if (accountType == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                AccountType ??= accountType;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading account type: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await AccountTypeGateway.UpdateAccountTypeAsync(Id, AccountType!);
+            if (result == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/account-types");
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error updating account type: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

@@ -3,6 +3,8 @@ using SimpleFinance.Repository.Configuration;
 using SimpleFinance.Services.Configuration;
 using SimpleFinance.WebApi.Configuration;
 using SimpleFinance.WebApi.Endpoints.Institutions;
+using SimpleFinance.WebApi.Endpoints.AccountTypes;
+using SimpleFinance.WebApi.Endpoints.Accounts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapInstitutionEndpoints();
+app.MapAccountTypeEndpoints();
+app.MapAccountEndpoints();
 
 
 

@@ -10,6 +10,8 @@ public static class DependencyInjection
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
        services.AddTransient<IInstitutionService, InstitutionService>();
+       services.AddTransient<IAccountTypeService, AccountTypeService>();
+       services.AddTransient<IAccountService, AccountService>();
 
         return services;
     }

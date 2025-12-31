@@ -1,0 +1,77 @@
+@page "/account-types/add"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject AccountTypeGateway AccountTypeGateway
+@inject NavigationManager NavigationManager
+
+<h3>Add Account Type</h3>
+
+<EditForm Model="@AccountType" OnValidSubmit="HandleValidSubmit" FormName="CreateAccountTypeForm">
+    <DataAnnotationsValidator/>
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="AccountType!.Name"/>
+        <ValidationMessage For="@(() => AccountType!.Name)"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" class="form-control" @bind="AccountType!.Description"></textarea>
+        <ValidationMessage For="@(() => AccountType!.Description)"/>
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+        @if (_isSubmitting)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Saving...</span>
+        }
+        else
+        {
+            <span>Create Account Type</span>
+        }
+    </button>
+    <a href="/account-types" class="btn btn-secondary ms-2">Cancel</a>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(_errorMessage))
+{
+    <div class="alert alert-danger mt-3">@_errorMessage</div>
+}
+
+@code {
+
+    [SupplyParameterFromForm]
+    private AccountTypeModel? AccountType { get; set; }
+
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        AccountType ??= new AccountTypeModel { Name = string.Empty };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            await AccountTypeGateway.CreateAccountTypeAsync(AccountType!);
+            NavigationManager.NavigateTo("/account-types");
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error creating account type: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

@@ -1,0 +1,185 @@
+@page "/accounts/{Id:int}/edit"
+@rendermode InteractiveServer
+@using SimpleFinance.WebApp.Gateway
+@using SimpleFinance.WebApp.Model
+@inject AccountGateway AccountGateway
+@inject AccountTypeGateway AccountTypeGateway
+@inject InstitutionGateway InstitutionGateway
+@inject NavigationManager NavigationManager
+
+<h3>Edit Account</h3>
+
+@if (_isLoading)
+{
+    <p>Loading...</p>
+}
+else if (_notFound)
+{
+    <div class="alert alert-warning">Account not found.</div>
+    <a href="/accounts" class="btn btn-secondary">Back to Accounts</a>
+}
+else if (Account != null)
+{
+    <EditForm Model="@Account" OnValidSubmit="HandleValidSubmit" FormName="EditAccountForm">
+        <DataAnnotationsValidator/>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="Account.Name"/>
+            <ValidationMessage For="@(() => Account.Name)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="accountNumber" class="form-label">Account Number</label>
+            <InputText id="accountNumber" class="form-control" @bind-Value="Account.AccountNumber"/>
+            <ValidationMessage For="@(() => Account.AccountNumber)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="accountType" class="form-label">Account Type</label>
+            <InputSelect id="accountType" class="form-select" @bind-Value="Account.AccountTypeId">
+                <option value="0">-- Select Account Type --</option>
+                @foreach (var accountType in _accountTypes)
+                {
+                    <option value="@accountType.Id">@accountType.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => Account.AccountTypeId)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="institution" class="form-label">Institution</label>
+            <InputSelect id="institution" class="form-select" @bind-Value="Account.InstitutionId">
+                <option value="@Guid.Empty">-- Select Institution --</option>
+                @foreach (var institution in _institutions)
+                {
+                    <option value="@institution.Id">@institution.Name</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => Account.InstitutionId)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="balance" class="form-label">Balance</label>
+            <InputNumber id="balance" class="form-control" @bind-Value="Account.Balance"/>
+            <ValidationMessage For="@(() => Account.Balance)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="currency" class="form-label">Currency</label>
+            <InputText id="currency" class="form-control" @bind-Value="Account.Currency"/>
+            <ValidationMessage For="@(() => Account.Currency)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="openedAt" class="form-label">Opened At</label>
+            <InputDate id="openedAt" class="form-control" @bind-Value="Account.OpenedAt"/>
+            <ValidationMessage For="@(() => Account.OpenedAt)"/>
+        </div>
+
+        <div class="mb-3">
+            <label for="closedAt" class="form-label">Closed At</label>
+            <InputDate id="closedAt" class="form-control" @bind-Value="Account.ClosedAt"/>
+            <ValidationMessage For="@(() => Account.ClosedAt)"/>
+        </div>
+
+        <div class="mb-3 form-check">
+            <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Account.IsActive"/>
+            <label for="isActive" class="form-check-label">Is Active</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+            @if (_isSubmitting)
+            {
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span>Saving...</span>
+            }
+            else
+            {
+                <span>Save Changes</span>
+            }
+        </button>
+        <a href="/accounts" class="btn btn-secondary ms-2">Cancel</a>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@_errorMessage</div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private AccountModel? Account { get; set; }
+
+    private IEnumerable<AccountTypeModel> _accountTypes = [];
+    private IEnumerable<InstitutionModel> _institutions = [];
+    private bool _isLoading = true;
+    private bool _isSubmitting;
+    private bool _notFound;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var accountTypesTask = AccountTypeGateway.GetAllAccountTypesAsync();
+            var institutionsTask = InstitutionGateway.GetAllInstitutionsAsync();
+            var accountTask = AccountGateway.GetAccountByIdAsync(Id);
+
+            await Task.WhenAll(accountTypesTask, institutionsTask, accountTask);
+
+            _accountTypes = await accountTypesTask;
+            _institutions = await institutionsTask;
+            var account = await accountTask;
+
+            if (account == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                Account ??= account;
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error loading data: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _isSubmitting = true;
+        _errorMessage = null;
+
+        try
+        {
+            var result = await AccountGateway.UpdateAccountAsync(Id, Account!);
+            if (result == null)
+            {
+                _notFound = true;
+            }
+            else
+            {
+                NavigationManager.NavigateTo("/accounts");
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error updating account: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}
+

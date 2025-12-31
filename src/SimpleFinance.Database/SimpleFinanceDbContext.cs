@@ -6,10 +6,24 @@ namespace SimpleFinance.Database;
 public class SimpleFinanceDbContext(DbContextOptions<SimpleFinanceDbContext> options) : DbContext(options)
 {
     public DbSet<Institution> Institutions { get; set; }
+    public DbSet<Account> Accounts { get; set; }
+    public DbSet<AccountType> AccountTypes { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Institution>()
+            .Property<uint>("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
+        modelBuilder.Entity<Account>()
+            .Property<uint>("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
+        modelBuilder.Entity<AccountType>()
             .Property<uint>("xmin")
             .HasColumnType("xid")
             .ValueGeneratedOnAddOrUpdate()
