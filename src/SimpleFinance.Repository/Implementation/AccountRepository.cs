@@ -40,6 +40,8 @@ public class AccountRepository(SimpleFinanceDbContext dbContext) : IAccountRepos
 
         dbAccount.Name = account.Name;
         dbAccount.AccountNumber = account.AccountNumber;
+        dbAccount.Iban = account.Iban;
+        dbAccount.SwiftBic = account.SwiftBic;
         dbAccount.AccountTypeId = account.AccountTypeId;
         dbAccount.Balance = account.Balance;
         dbAccount.Currency = account.Currency;

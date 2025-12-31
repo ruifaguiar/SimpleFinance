@@ -13,6 +13,12 @@ public class AccountModel
     [MaxLength(50)]
     public string? AccountNumber { get; set; }
 
+    [MaxLength(34)]
+    public string? Iban { get; set; }
+
+    [MaxLength(11)]
+    public string? SwiftBic { get; set; }
+
     [Required]
     public required int AccountTypeId { get; set; }
 
