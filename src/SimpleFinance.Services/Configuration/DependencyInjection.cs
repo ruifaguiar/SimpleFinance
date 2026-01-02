@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleFinance.Services.Implementation;
+using SimpleFinance.Services.Implementation.Accounts;
 using SimpleFinance.Services.Interfaces;
 
 namespace SimpleFinance.Services.Configuration;

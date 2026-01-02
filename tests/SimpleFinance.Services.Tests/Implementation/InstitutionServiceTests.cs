@@ -1,7 +1,7 @@
 using NSubstitute;
 using SimpleFinance.Domain.DomainObjects;
 using SimpleFinance.Repository.Interfaces;
-using SimpleFinance.Services.Implementation;
+using SimpleFinance.Services.Implementation.Accounts;
 
 namespace SimpleFinance.Services.Tests.Implementation;
 
