@@ -8,4 +8,5 @@ public interface IInstitutionService
     Task<IEnumerable<Institution>> GetAllInstitutionsAsync(CancellationToken cancellationToken);
     Task<Institution> GetInstitutionByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<Institution> UpdateInstitutionAsync(Institution institution, CancellationToken cancellationToken);
+    Task DeleteInstitutionAsync(Guid id, CancellationToken cancellationToken);
 }

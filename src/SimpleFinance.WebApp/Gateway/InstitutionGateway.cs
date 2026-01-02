@@ -39,4 +39,15 @@ public class InstitutionGateway(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<InstitutionModel>();
     }
+    
+    public async Task<bool> DeleteInstitutionAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"/api/institution/{id}");
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+        response.EnsureSuccessStatusCode();
+        return true;
+    }
 }

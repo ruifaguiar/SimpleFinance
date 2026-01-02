@@ -31,12 +31,13 @@
         navItems = new List<NavItem>
         {
             new NavItem { Id = "1", Href = "/home", IconName = IconName.HouseDoorFill, Text = "Home", Match=NavLinkMatch.All},
-            new NavItem { Id = "2", Href = "/institutions", IconName = IconName.Bank, Text = "Institutions"},
-            new NavItem { Id = "3", Href = "/account-types", IconName = IconName.ListUl, Text = "Account Types"},
-            new NavItem { Id = "4", Href = "/accounts", IconName = IconName.Wallet2, Text = "Accounts"},
-            new NavItem { Id = "5", Href = "/expense-categories", IconName = IconName.Tags, Text = "Expense Categories"},
-            new NavItem { Id = "6", Href = "/transactions", IconName = IconName.CashCoin, Text = "Transactions"},
-            new NavItem { Id = "7", Href = "/transaction-types", IconName = IconName.Receipt, Text = "Transaction Types"}
+            new NavItem { Id = "2", IconName = IconName.ExclamationTriangleFill, Text = "Configuration" },
+            new NavItem { Id = "3", Href = "/institutions", IconName = IconName.Bank, Text = "Institutions", ParentId = "2"},
+            new NavItem { Id = "4", Href = "/account-types", IconName = IconName.ListUl, Text = "Account Types", ParentId = "2"},
+            new NavItem { Id = "5", Href = "/accounts", IconName = IconName.Wallet2, Text = "Accounts", ParentId = "2"},
+            new NavItem { Id = "6", Href = "/expense-categories", IconName = IconName.Tags, Text = "Expense Categories", ParentId = "2"},
+            new NavItem { Id = "7", Href = "/transactions", IconName = IconName.CashCoin, Text = "Transactions", ParentId = "2"},
+            new NavItem { Id = "8", Href = "/transaction-types", IconName = IconName.Receipt, Text = "Transaction Types", ParentId = "2"}
         };
 
         return navItems;

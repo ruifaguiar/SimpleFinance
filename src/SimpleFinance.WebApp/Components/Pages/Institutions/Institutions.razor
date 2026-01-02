@@ -40,17 +40,41 @@ else
                     <td>@institution.Name</td>
                     <td>
                         <a href="/institutions/@institution.Id/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button class="btn btn-sm btn-outline-danger" @onclick="() => ConfirmDelete(institution)">Delete</button>
                     </td>
                 </tr>
             }
         </tbody>
-    </table>
+        </table>
+}
+
+@if (_showDeleteConfirmation && _institutionToDelete != null)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CancelDelete"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete institution "<strong>@_institutionToDelete.Name</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelDelete">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="DeleteInstitution">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
     private IEnumerable<InstitutionModel>? _institutions;
     private bool _isLoading = true;
     private string? _errorMessage;
+    private bool _showDeleteConfirmation;
+    private InstitutionModel? _institutionToDelete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,6 +89,45 @@ else
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private void ConfirmDelete(InstitutionModel institution)
+    {
+        _institutionToDelete = institution;
+        _showDeleteConfirmation = true;
+    }
+
+    private void CancelDelete()
+    {
+        _institutionToDelete = null;
+        _showDeleteConfirmation = false;
+    }
+
+    private async Task DeleteInstitution()
+    {
+        if (_institutionToDelete?.Id == null) return;
+
+        try
+        {
+            var deleted = await InstitutionGateway.DeleteInstitutionAsync(_institutionToDelete.Id.Value);
+            if (deleted)
+            {
+                _institutions = await InstitutionGateway.GetAllInstitutionsAsync();
+            }
+            else
+            {
+                _errorMessage = "Institution not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error deleting institution: {ex.Message}";
+        }
+        finally
+        {
+            _institutionToDelete = null;
+            _showDeleteConfirmation = false;
         }
     }
 }
