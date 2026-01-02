@@ -1,4 +1,4 @@
-namespace SimpleFinance.Repository.Mappings.AccountType;
+namespace SimpleFinance.Repository.Mappings.Accounts;
 
 using DbAccountType = SimpleFinance.Database.Entities.AccountType;
 using DomainAccountType = SimpleFinance.Domain.DomainObjects.AccountType;
