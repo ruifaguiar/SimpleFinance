@@ -1,4 +1,4 @@
-@page "/institutions/{Id:guid}/edit"
+@page "/institutions/{Id:int}/edit"
 @rendermode InteractiveServer
 @using SimpleFinance.WebApp.Gateway
 @using SimpleFinance.WebApp.Model
@@ -49,7 +49,7 @@ else if (Institution != null)
 
 @code {
     [Parameter]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     [SupplyParameterFromForm]
     private InstitutionModel? Institution { get; set; }

@@ -1,7 +1,7 @@
 using SimpleFinance.WebApi.Model;
 using DomainAccount = SimpleFinance.Domain.DomainObjects.Account;
 
-namespace SimpleFinance.WebApi.Mappings.Account;
+namespace SimpleFinance.WebApi.Mappings.Accounts;
 
 public static class AccountMappings
 {
@@ -19,9 +19,9 @@ public static class AccountMappings
             model.InstitutionId,
             model.IsActive,
             model.OpenedAt,
-            model.ClosedAt,
-            model.CreatedAt ?? DateTime.UtcNow,
-            model.ModifiedAt);
+            model.ClosedAt, 
+            DateTime.UtcNow,
+            null);
     }
 
     public static AccountModel ToModel(this DomainAccount account)
@@ -39,9 +39,7 @@ public static class AccountMappings
             InstitutionId = account.InstitutionId,
             IsActive = account.IsActive,
             OpenedAt = account.OpenedAt,
-            ClosedAt = account.ClosedAt,
-            CreatedAt = account.CreatedAt,
-            ModifiedAt = account.ModifiedAt
+            ClosedAt = account.ClosedAt
         };
     }
 }

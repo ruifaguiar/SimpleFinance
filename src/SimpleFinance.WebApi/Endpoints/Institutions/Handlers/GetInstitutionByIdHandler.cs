@@ -6,7 +6,7 @@ namespace SimpleFinance.WebApi.Endpoints.Institutions.Handlers;
 
 public class GetInstitutionByIdHandler(IInstitutionService institutionService)
 {
-    public async Task<IResult> HandleAsync(Guid institutionId,CancellationToken cancellationToken)
+    public async Task<IResult> HandleAsync(int institutionId,CancellationToken cancellationToken)
     {
         Domain.DomainObjects.Institution institution;
 

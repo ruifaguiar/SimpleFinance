@@ -2,14 +2,14 @@ namespace SimpleFinance.Domain.DomainObjects;
 
 public record Institution
 {
-    public Guid Id { get; }
+    public int Id { get; }
     public string Name { get; }
 
-    public Institution(Guid id, string name)
+    public Institution(int id, string name)
     {
-        if (id == Guid.Empty)
+        if (id < 0)
         {
-            throw new ArgumentException("Id cannot be empty", nameof(id));
+            throw new ArgumentException("Id cannot be less than 0", nameof(id));
         }
 
         if (string.IsNullOrWhiteSpace(name))
@@ -19,5 +19,15 @@ public record Institution
 
         Id = id;
         Name = name;
+    }
+
+    public virtual bool Equals(Institution? other)
+    {
+        return other is not null && Id == other.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
     }
 }

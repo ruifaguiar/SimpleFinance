@@ -4,6 +4,7 @@
 @using SimpleFinance.WebApp.Model
 @inject TransactionGateway TransactionGateway
 @inject AccountGateway AccountGateway
+@inject TransactionTypeGateway TransactionTypeGateway
 @inject NavigationManager NavigationManager
 
 <h3>Add Transaction</h3>
@@ -35,10 +36,16 @@ else
             <ValidationMessage For="@(() => Transaction!.Amount)"/>
             <small class="text-muted">Use negative values for expenses/withdrawals and positive for income/deposits.</small>
         </div>
-
+        
         <div class="mb-3">
-            <label for="transactionTypeId" class="form-label">Transaction Type ID</label>
-            <InputNumber id="transactionTypeId" class="form-control" @bind-Value="Transaction!.TransactionTypeId"/>
+            <label for="transactionTypes" class="form-label">Transaction Type</label>
+            <InputSelect id="transactionTypes" class="form-select" @bind-Value="Transaction!.TransactionTypeId">
+                <option value="0">-- Select Transaction Type --</option>
+                @foreach (var tp in _transactionTypes)
+                {
+                    <option value="@tp.Id">@tp.Name</option>
+                }
+            </InputSelect>
             <ValidationMessage For="@(() => Transaction!.TransactionTypeId)"/>
         </div>
 
@@ -85,6 +92,7 @@ else
     private TransactionModel? Transaction { get; set; }
 
     private IEnumerable<AccountModel> _accounts = [];
+    private IEnumerable<TransactionTypeModel> _transactionTypes = [];
     private bool _isLoading = true;
     private bool _isSubmitting;
     private string? _errorMessage;
@@ -104,6 +112,7 @@ else
         try
         {
             _accounts = await AccountGateway.GetAllAccountsAsync();
+            _transactionTypes = await TransactionTypeGateway.GetAllTransactionTypesAsync();
         }
         catch (Exception ex)
         {

@@ -6,11 +6,9 @@ public static class InstitutionMappings
 {
     public static Domain.DomainObjects.Institution ToDomain(this InstitutionModel institutionModel)
     {
-        institutionModel.Id ??= Guid.NewGuid();
-            
-        return new Domain.DomainObjects.Institution(institutionModel.Id.Value, institutionModel.Name);
+        return new Domain.DomainObjects.Institution(institutionModel.Id ?? 0, institutionModel.Name);
     }
-    
+
     public static InstitutionModel ToModel(this Domain.DomainObjects.Institution institution)
     {
         return new InstitutionModel

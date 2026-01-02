@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleFinance.Database.Entities;
 
-public class AccountType
+public sealed class AccountType
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [Required]
     [MaxLength(50)]
@@ -15,5 +15,9 @@ public class AccountType
 
     [MaxLength(200)]
     public string? Description { get; set; }
+    
+    public DateTime CreatedAt { get; init; }
+
+    public DateTime? ModifiedAt { get; init; }
 }
 

@@ -1,6 +1,6 @@
 using SimpleFinance.Domain.Exceptions;
 using SimpleFinance.Services.Interfaces;
-using SimpleFinance.WebApi.Mappings.Account;
+using SimpleFinance.WebApi.Mappings.Accounts;
 
 namespace SimpleFinance.WebApi.Endpoints.Accounts.Handlers;
 

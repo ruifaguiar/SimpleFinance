@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleFinance.Database.Entities;
 
-public class Account
+public sealed class Account
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [Required]
     [MaxLength(100)]
@@ -30,8 +30,8 @@ public class Account
     [MaxLength(3)]
     public string Currency { get; set; } = "EUR";
 
-    public Guid InstitutionId { get; set; }
-
+    public int InstitutionId { get; set; }
+    
     public bool IsActive { get; set; } = true;
 
     public DateOnly? OpenedAt { get; set; }

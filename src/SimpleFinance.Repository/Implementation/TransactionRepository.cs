@@ -50,7 +50,7 @@ public class TransactionRepository(SimpleFinanceDbContext dbContext) : ITransact
         dbTransaction.AccountId = transaction.AccountId;
         dbTransaction.Amount = transaction.Amount;
         dbTransaction.TransactionTypeId = transaction.TransactionTypeId;
-        dbTransaction.TransactionDate = transaction.TransactionDate;
+        dbTransaction.TransactionDate = DateTime.SpecifyKind(transaction.TransactionDate, DateTimeKind.Utc);
         dbTransaction.Description = transaction.Description;
         dbTransaction.BalanceAfterTransaction = transaction.BalanceAfterTransaction;
         dbTransaction.Currency = transaction.Currency;

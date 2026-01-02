@@ -5,7 +5,7 @@ namespace SimpleFinance.WebApi.Endpoints.Institutions.Handlers;
 
 public class DeleteInstitutionHandler(IInstitutionService institutionService)
 {
-    public async Task<IResult> HandleAsync(Guid institutionId, CancellationToken cancellationToken)
+    public async Task<IResult> HandleAsync(int institutionId, CancellationToken cancellationToken)
     {
         try
         {

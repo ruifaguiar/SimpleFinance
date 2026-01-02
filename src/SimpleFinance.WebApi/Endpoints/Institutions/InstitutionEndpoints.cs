@@ -19,18 +19,18 @@ public static class InstitutionEndpoints
                     handler.HandleAsync(institutionModel, cancellationToken))
             .WithName("AddInstitution");
         
-        endpoints.MapGet("/api/institution/{institutionId:guid}",
-                ([FromServices] GetInstitutionByIdHandler handler, [FromRoute] Guid institutionId, CancellationToken cancellationToken) =>
+        endpoints.MapGet("/api/institution/{institutionId:int}",
+                ([FromServices] GetInstitutionByIdHandler handler, [FromRoute] int institutionId, CancellationToken cancellationToken) =>
                     handler.HandleAsync(institutionId, cancellationToken))
             .WithName("GetInstitutionById");
         
-        endpoints.MapPut("/api/institution/{institutionId:guid}",
-                ([FromServices] UpdateInstitutionHandler handler, [FromRoute] Guid institutionId, [FromBody] InstitutionModel institutionModel, CancellationToken cancellationToken) =>
+        endpoints.MapPut("/api/institution/{institutionId:int}",
+                ([FromServices] UpdateInstitutionHandler handler, [FromRoute] int institutionId, [FromBody] InstitutionModel institutionModel, CancellationToken cancellationToken) =>
                     handler.HandleAsync(institutionId, institutionModel, cancellationToken))
             .WithName("UpdateInstitution");
         
-        endpoints.MapDelete("/api/institution/{institutionId:guid}",
-                ([FromServices] DeleteInstitutionHandler handler, [FromRoute] Guid institutionId, CancellationToken cancellationToken) =>
+        endpoints.MapDelete("/api/institution/{institutionId:int}",
+                ([FromServices] DeleteInstitutionHandler handler, [FromRoute] int institutionId, CancellationToken cancellationToken) =>
                     handler.HandleAsync(institutionId, cancellationToken))
             .WithName("DeleteInstitution");
 
