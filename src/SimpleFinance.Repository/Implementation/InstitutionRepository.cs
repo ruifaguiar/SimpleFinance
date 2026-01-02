@@ -16,7 +16,7 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
 
         dbContext.Institutions.Add(dbInstitution);
         await dbContext.SaveChangesAsync(cancellationToken);
-        return institution;
+        return dbInstitution.ToDomain();
     }
     
     public async Task<IEnumerable<Institution>> GetAllInstitutionsAsync(CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
         return institutions.Select(i => i.ToDomain());
     }
     
-    public async Task<Institution> GetInstitutionByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Institution> GetInstitutionByIdAsync(int id, CancellationToken cancellationToken)
     {
         var institution = await dbContext.Institutions.FindAsync([id], cancellationToken);
         NotFoundException.ThrowIfNotFound(institution, $"Institution with ID {id} not found.");
@@ -52,7 +52,7 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
         return dbInstitution.ToDomain();
     }
     
-    public async Task DeleteInstitutionAsync(Guid id, CancellationToken cancellationToken)
+    public async Task DeleteInstitutionAsync(int id, CancellationToken cancellationToken)
     {
         var dbInstitution = await dbContext.Institutions.FindAsync([id], cancellationToken);
         NotFoundException.ThrowIfNotFound(dbInstitution, $"Institution with ID {id} not found.");

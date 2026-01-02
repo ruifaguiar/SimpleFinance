@@ -1,5 +1,5 @@
 using SimpleFinance.Services.Interfaces;
-using SimpleFinance.WebApi.Mappings.Account;
+using SimpleFinance.WebApi.Mappings.Accounts;
 using SimpleFinance.WebApi.Model;
 
 namespace SimpleFinance.WebApi.Endpoints.Accounts.Handlers;

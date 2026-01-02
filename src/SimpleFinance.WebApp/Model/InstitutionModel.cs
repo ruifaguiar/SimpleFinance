@@ -4,7 +4,7 @@ namespace SimpleFinance.WebApp.Model;
 
 public class InstitutionModel
 {
-    public Guid? Id { get; set; }
+    public int? Id { get; set; }
     
     [Required]
     [MaxLength (100)]

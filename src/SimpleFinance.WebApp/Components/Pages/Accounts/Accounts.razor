@@ -86,7 +86,7 @@ else
 @code {
     private IEnumerable<AccountModel>? _accounts;
     private Dictionary<int, string> _accountTypeNames = new();
-    private Dictionary<Guid, string> _institutionNames = new();
+    private Dictionary<int, string> _institutionNames = new();
     private bool _isLoading = true;
     private string? _errorMessage;
     private bool _showDeleteConfirmation;
@@ -132,9 +132,9 @@ else
         return _accountTypeNames.TryGetValue(accountTypeId, out var name) ? name : "Unknown";
     }
 
-    private string GetInstitutionName(Guid institutionId)
+    private string GetInstitutionName(int institutionId)
     {
-        return _institutionNames.TryGetValue(institutionId, out var name) ? name : "Unknown";
+        return _institutionNames.GetValueOrDefault(institutionId, "Unknown");
     }
 
     private void ConfirmDelete(AccountModel account)

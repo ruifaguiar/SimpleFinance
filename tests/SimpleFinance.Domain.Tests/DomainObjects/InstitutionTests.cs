@@ -7,7 +7,7 @@ public class InstitutionTests
     [Fact]
     public void Constructor_WithValidId_ShouldSetId()
     {
-        var id = Guid.NewGuid();
+        const int id = 2;
         
         var institution = new Institution(id, "Test");
         
@@ -19,31 +19,31 @@ public class InstitutionTests
     {
         const string name = "Test Institution";
         
-        var institution = new Institution(Guid.NewGuid(), name);
+        var institution = new Institution(1, name);
         
         Assert.Equal(name, institution.Name);
     }
 
     [Fact]
-    public void Constructor_WithEmptyGuid_ShouldThrowArgumentException()
+    public void Constructor_WithNegativeId_ShouldThrowArgumentException()
     {
-        var exception = Assert.Throws<ArgumentException>(() => new Institution(Guid.Empty, "Test"));
+        var exception = Assert.Throws<ArgumentException>(() => new Institution(-1, "Test"));
         
         Assert.Equal("id", exception.ParamName);
     }
 
     [Fact]
-    public void Constructor_WithEmptyGuid_ShouldContainCorrectMessage()
+    public void Constructor_WithNegativeId_ShouldContainCorrectMessage()
     {
-        var exception = Assert.Throws<ArgumentException>(() => new Institution(Guid.Empty, "Test"));
+        var exception = Assert.Throws<ArgumentException>(() => new Institution(-1, "Test"));
         
-        Assert.Contains("Id cannot be empty", exception.Message);
+        Assert.Contains("Id cannot be less than 0", exception.Message);
     }
 
     [Fact]
     public void Constructor_WithEmptyName_ShouldThrowArgumentException()
     {
-        var exception = Assert.Throws<ArgumentException>(() => new Institution(Guid.NewGuid(), string.Empty));
+        var exception = Assert.Throws<ArgumentException>(() => new Institution(2, string.Empty));
         
         Assert.Equal("name", exception.ParamName);
     }
@@ -51,19 +51,18 @@ public class InstitutionTests
     [Fact]
     public void Constructor_WithEmptyName_ShouldContainCorrectMessage()
     {
-        var exception = Assert.Throws<ArgumentException>(() => new Institution(Guid.NewGuid(), string.Empty));
+        var exception = Assert.Throws<ArgumentException>(() => new Institution(1, string.Empty));
         
         Assert.Contains("Name cannot be empty", exception.Message);
     }
 
     [Fact]
-    public void Equality_TwoInstitutionsWithSameValues_ShouldBeEqual()
+    public void Equality_TwoInstitutionsWithSameId_ShouldBeEqual()
     {
-        var id = Guid.NewGuid();
-        const string name = "Test";
+        const int id = 1;
         
-        var institution1 = new Institution(id, name);
-        var institution2 = new Institution(id, name);
+        var institution1 = new Institution(id, "Name1");
+        var institution2 = new Institution(id, "Name2");
         
         Assert.Equal(institution1, institution2);
     }
@@ -71,20 +70,21 @@ public class InstitutionTests
     [Fact]
     public void Equality_TwoInstitutionsWithDifferentIds_ShouldNotBeEqual()
     {
-        var institution1 = new Institution(Guid.NewGuid(), "Test");
-        var institution2 = new Institution(Guid.NewGuid(), "Test");
+        var institution1 = new Institution(1, "Test");
+        var institution2 = new Institution(2, "Test");
         
         Assert.NotEqual(institution1, institution2);
     }
 
     [Fact]
-    public void Equality_TwoInstitutionsWithDifferentNames_ShouldNotBeEqual()
+    public void GetHashCode_TwoInstitutionsWithSameId_ShouldHaveSameHashCode()
     {
-        var id = Guid.NewGuid();
+        const int id = 1;
         
-        var institution1 = new Institution(id, "Test1");
-        var institution2 = new Institution(id, "Test2");
+        var institution1 = new Institution(id, "Name1");
+        var institution2 = new Institution(id, "Name2");
         
-        Assert.NotEqual(institution1, institution2);
+        Assert.Equal(institution1.GetHashCode(), institution2.GetHashCode());
     }
+    
 }

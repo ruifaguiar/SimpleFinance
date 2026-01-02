@@ -19,7 +19,7 @@ public class InstitutionServiceTests
     [Fact]
     public async Task AddInstitutionAsync_ShouldCallRepository()
     {
-        var institution = new Institution(Guid.NewGuid(), "Test Institution");
+        var institution = new Institution(1, "Test Institution");
         _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns(institution);
 
         await _sut.AddInstitutionAsync(institution,CancellationToken.None);
@@ -30,7 +30,7 @@ public class InstitutionServiceTests
     [Fact]
     public async Task AddInstitutionAsync_ShouldReturnInstitutionFromRepository()
     {
-        var institution = new Institution(Guid.NewGuid(), "Test Institution");
+        var institution = new Institution(1, "Test Institution");
         _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns(institution);
 
         var result = await _sut.AddInstitutionAsync(institution,CancellationToken.None);
@@ -41,8 +41,8 @@ public class InstitutionServiceTests
     [Fact]
     public async Task AddInstitutionAsync_ShouldPassCorrectInstitutionToRepository()
     {
-        var id = Guid.NewGuid();
-        var name = "Test Institution";
+        const int id = 1;
+        const string name = "Test Institution";
         var institution = new Institution(id, name);
         _repository.AddInstitutionAsync(Arg.Any<Institution>(),CancellationToken.None).Returns(institution);
 
@@ -54,7 +54,7 @@ public class InstitutionServiceTests
     [Fact]
     public async Task AddInstitutionAsync_WhenRepositoryThrows_ShouldPropagateException()
     {
-        var institution = new Institution(Guid.NewGuid(), "Test");
+        var institution = new Institution(1, "Test");
         _repository.AddInstitutionAsync(institution,CancellationToken.None).Returns<Institution>(_ => throw new InvalidOperationException("Database error"));
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => _sut.AddInstitutionAsync(institution,CancellationToken.None));

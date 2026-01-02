@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleFinance.Database.Entities;
 
-public class Institution
+public sealed class Institution
 {
-    public required Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public required int Id { get; init; }
     
     [MaxLength(100)]
     public required string Name { get; set; }

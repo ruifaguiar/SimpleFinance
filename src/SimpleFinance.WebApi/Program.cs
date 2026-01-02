@@ -37,3 +37,5 @@ app.MapTransactionTypeEndpoints();
 
 app.Run();
 
+public partial class Program { }
+

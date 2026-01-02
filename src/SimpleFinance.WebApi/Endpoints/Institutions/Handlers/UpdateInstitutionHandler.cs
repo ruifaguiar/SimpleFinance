@@ -7,12 +7,12 @@ namespace SimpleFinance.WebApi.Endpoints.Institutions.Handlers;
 
 public class UpdateInstitutionHandler(IInstitutionService institutionService, ILogger<UpdateInstitutionHandler> logger)
 {
-    public async Task<IResult> HandleAsync(Guid institutionId, InstitutionModel institutionModel,
+    public async Task<IResult> HandleAsync(int institutionId, InstitutionModel institutionModel,
         CancellationToken cancellationToken)
     {
         logger.LogInformation("Updating institution with ID {InstitutionId}", institutionId);
 
-        if (institutionModel.Id != null && institutionModel.Id != institutionId)
+        if (institutionModel.Id != institutionId)
         {
             logger.LogWarning("Institution ID mismatch: URL ID {UrlId} does not match body ID {BodyId}", institutionId,
                 institutionModel.Id);

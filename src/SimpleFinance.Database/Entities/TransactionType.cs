@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleFinance.Database.Entities;
 
-public class TransactionType
+public sealed class TransactionType
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
     
     [Required]
     [MaxLength(50)]
@@ -29,5 +29,4 @@ public class TransactionType
     
     public int ExpenseCategoryId { get; set; }
     
-    public virtual ExpenseCategory? ExpenseCategory { get; set; }
 }

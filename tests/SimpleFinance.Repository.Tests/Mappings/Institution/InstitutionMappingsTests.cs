@@ -9,7 +9,7 @@ public class InstitutionMappingsTests
     [Fact]
     public void ToDb_ShouldMapIdCorrectly()
     {
-        var id = Guid.NewGuid();
+        const int id = 1;
         var domain = new DomainInstitution(id, "Test Institution");
 
         var result = domain.ToDb();
@@ -20,8 +20,8 @@ public class InstitutionMappingsTests
     [Fact]
     public void ToDb_ShouldMapNameCorrectly()
     {
-        var name = "Test Institution";
-        var domain = new DomainInstitution(Guid.NewGuid(), name);
+        const string name = "Test Institution";
+        var domain = new DomainInstitution(1, name);
 
         var result = domain.ToDb();
 
@@ -31,7 +31,7 @@ public class InstitutionMappingsTests
     [Fact]
     public void ToDb_ShouldReturnDbInstitutionType()
     {
-        var domain = new DomainInstitution(Guid.NewGuid(), "Test");
+        var domain = new DomainInstitution(1, "Test");
 
         var result = domain.ToDb();
 
@@ -39,12 +39,34 @@ public class InstitutionMappingsTests
     }
 
     [Fact]
-    public void ToDb_WithEmptyName_ShouldMapCorrectly()
+    public void ToDomain_ShouldMapIdCorrectly()
     {
-        var domain = new DomainInstitution(Guid.NewGuid(), string.Empty);
+        const int id = 1;
+        var db = new DbInstitution { Id = id, Name = "Test Institution" };
 
-        var result = domain.ToDb();
+        var result = db.ToDomain();
 
-        Assert.Equal(string.Empty, result.Name);
+        Assert.Equal(id, result.Id);
+    }
+
+    [Fact]
+    public void ToDomain_ShouldMapNameCorrectly()
+    {
+        const string name = "Test Institution";
+        var db = new DbInstitution { Id = 1, Name = name };
+
+        var result = db.ToDomain();
+
+        Assert.Equal(name, result.Name);
+    }
+
+    [Fact]
+    public void ToDomain_ShouldReturnDomainInstitutionType()
+    {
+        var db = new DbInstitution { Id = 1, Name = "Test" };
+
+        var result = db.ToDomain();
+
+        Assert.IsType<DomainInstitution>(result);
     }
 }

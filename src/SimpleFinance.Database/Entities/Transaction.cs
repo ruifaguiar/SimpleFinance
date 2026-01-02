@@ -3,22 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SimpleFinance.Database.Entities;
 
-public class Transaction
+public sealed class Transaction
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     [Required] 
     public int AccountId { get; set; }
-
+    
     [Column(TypeName = "decimal(18,4)")] 
     public decimal Amount { get; set; }
 
     [Required]
     public int TransactionTypeId { get; set; }
-
-    public virtual required TransactionType TransactionType { get; set; }
 
     public DateTime TransactionDate { get; set; }
 

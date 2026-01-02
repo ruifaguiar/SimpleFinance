@@ -44,7 +44,7 @@ public record Transaction
         {
             throw new ArgumentException("Currency must be a 3-character code", nameof(currency));
         }
-
+        
         Id = id;
         AccountId = accountId;
         Amount = amount;
