@@ -2,7 +2,7 @@ using SimpleFinance.Domain.DomainObjects;
 using SimpleFinance.Repository.Interfaces;
 using SimpleFinance.Services.Interfaces;
 
-namespace SimpleFinance.Services.Implementation;
+namespace SimpleFinance.Services.Implementation.Accounts;
 
 public class AccountService(IAccountRepository repository) : IAccountService
 {

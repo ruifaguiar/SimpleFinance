@@ -3,7 +3,7 @@ using SimpleFinance.Database;
 using SimpleFinance.Domain.DomainObjects;
 using SimpleFinance.Domain.Exceptions;
 using SimpleFinance.Repository.Interfaces;
-using SimpleFinance.Repository.Mappings.Account;
+using SimpleFinance.Repository.Mappings.Accounts;
 
 namespace SimpleFinance.Repository.Implementation;
 
