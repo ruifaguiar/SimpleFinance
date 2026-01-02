@@ -51,4 +51,13 @@ public class InstitutionRepository(SimpleFinanceDbContext dbContext) : IInstitut
         
         return dbInstitution.ToDomain();
     }
+    
+    public async Task DeleteInstitutionAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var dbInstitution = await dbContext.Institutions.FindAsync([id], cancellationToken);
+        NotFoundException.ThrowIfNotFound(dbInstitution, $"Institution with ID {id} not found.");
+        
+        dbContext.Institutions.Remove(dbInstitution);
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -25,4 +25,9 @@ public class InstitutionService(IInstitutionRepository repository) : IInstitutio
     {
         return repository.UpdateInstitutionAsync(institution, cancellationToken);
     }
+    
+    public Task DeleteInstitutionAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return repository.DeleteInstitutionAsync(id, cancellationToken);
+    }
 }

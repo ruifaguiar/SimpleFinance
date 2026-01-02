@@ -28,7 +28,11 @@ public static class InstitutionEndpoints
                 ([FromServices] UpdateInstitutionHandler handler, [FromRoute] Guid institutionId, [FromBody] InstitutionModel institutionModel, CancellationToken cancellationToken) =>
                     handler.HandleAsync(institutionId, institutionModel, cancellationToken))
             .WithName("UpdateInstitution");
-                
+        
+        endpoints.MapDelete("/api/institution/{institutionId:guid}",
+                ([FromServices] DeleteInstitutionHandler handler, [FromRoute] Guid institutionId, CancellationToken cancellationToken) =>
+                    handler.HandleAsync(institutionId, cancellationToken))
+            .WithName("DeleteInstitution");
 
         return endpoints;
     }

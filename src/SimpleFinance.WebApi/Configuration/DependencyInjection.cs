@@ -41,7 +41,8 @@ public static class DependencyInjection
             .AddScoped<GetTransactionTypeByIdHandler>()
             .AddScoped<GetAllTransactionTypesHandler>()
             .AddScoped<UpdateTransactionTypeHandler>()
-            .AddScoped<DeleteTransactionTypeHandler>();
+            .AddScoped<DeleteTransactionTypeHandler>()
+            .AddScoped<DeleteInstitutionHandler>();
         
         return services;
     }
